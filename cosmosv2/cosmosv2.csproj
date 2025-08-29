@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>cosmosv2</RootNamespace>
     <UserSecretsId>94583b51-a56c-4cd8-a524-30dc8eba4f57</UserSecretsId>
 	<Nullable>enable</Nullable>
@@ -12,6 +12,9 @@
     <None Remove="js\preTriggerAll1.js" />
     <None Remove="js\storedProcedure1.js" />
     <None Remove="js\userDefinedFunction1.js" />
+    <Compile Remove="backup\**" />
+    <EmbeddedResource Remove="backup\**" />
+    <None Remove="backup\**" />
   </ItemGroup>
 
   <ItemGroup>

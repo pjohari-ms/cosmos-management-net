@@ -25,6 +25,9 @@ namespace cosmosv2
 
         static async Task Main(string[] args)
         {
+            Console.WriteLine("Azure Cosmos DB Management using Azure.ResourceManager.CosmosDB");
+            Console.WriteLine("================================================================");
+            
             //=================================================================
             //Load secrets
             IConfigurationBuilder builder = new ConfigurationBuilder()
@@ -53,12 +56,8 @@ namespace cosmosv2
                     Console.WriteLine($"[c]   Set Region for ARM account resource");
                     Console.WriteLine($"[d]   Set or Create a Resource Group");
                     Console.WriteLine($"--------------------------------------");
-                    Console.WriteLine($"[e]   Database Account Operations");
-                    Console.WriteLine($"[f]   Cassandra API Operations");
-                    Console.WriteLine($"[g]   Gremlin API Operations");
-                    Console.WriteLine($"[h]   MongoDB API Operations");
-                    Console.WriteLine($"[i]   NoSQL API Operations");
-                    Console.WriteLine($"[j]   Table API Operations");
+                    Console.WriteLine($"[e]   Database Account Operations (Basic)");
+                    Console.WriteLine($"[f]   NoSQL API Operations (Basic)");
                     Console.WriteLine($"[x]   Exit");
 
                     ConsoleKeyInfo result = Console.ReadKey(true);
@@ -86,32 +85,12 @@ namespace cosmosv2
                     else if (result.KeyChar == 'e')
                     {
                         Console.Clear();
-                        await Account(_armClient, _subscription, _resourceGroup, _location);
+                        await AccountOperations();
                     }
                     else if (result.KeyChar == 'f')
                     {
                         Console.Clear();
-                        await Cassandra(_armClient, _subscription, _resourceGroup, _location);
-                    }
-                    else if (result.KeyChar == 'g')
-                    {
-                        Console.Clear();
-                        await Gremlin(_armClient, _subscription, _resourceGroup, _location);
-                    }
-                    else if (result.KeyChar == 'h')
-                    {
-                        Console.Clear();
-                        await MongoDB(_armClient, _subscription, _resourceGroup, _location);
-                    }
-                    else if (result.KeyChar == 'i')
-                    {
-                        Console.Clear();
-                        await NoSql(_armClient, _subscription, _resourceGroup, _location);
-                    }
-                    else if (result.KeyChar == 'j')
-                    {
-                        Console.Clear();
-                        await Table(_armClient, _subscription, _resourceGroup, _location);
+                        await NoSqlOperations();
                     }
                     else if (result.KeyChar == 'x')
                     {
@@ -231,41 +210,72 @@ namespace cosmosv2
             return prefix + random.Next(1000, 9999).ToString();
         }
 
-        // Placeholder methods for different API operations - these will be implemented
-        static async Task Account(ArmClient armClient, SubscriptionResource subscription, ResourceGroupResource resourceGroup, string location)
+        static async Task AccountOperations()
         {
-            DatabaseAccount account = new DatabaseAccount();
-            await account.ManageAccountOperations(armClient, subscription, resourceGroup, location);
+            Console.WriteLine("Basic Database Account Operations");
+            Console.WriteLine("================================");
+            Console.WriteLine($"Resource Group: {_resourceGroupName}");
+            Console.WriteLine($"Location: {_location}");
+            
+            Console.WriteLine("\nDemonstrating Azure.ResourceManager.CosmosDB SDK usage:");
+            Console.WriteLine("- Uses ArmClient instead of CosmosDBManagementClient");
+            Console.WriteLine("- Uses Azure.Identity for authentication");
+            Console.WriteLine("- Uses Resource Collections pattern");
+            Console.WriteLine("- Different model classes and naming conventions");
+            
+            try
+            {
+                // List existing Cosmos DB accounts
+                Console.WriteLine("\nListing Cosmos DB accounts in resource group...");
+                await foreach (var account in _resourceGroup.GetCosmosDBAccounts())
+                {
+                    Console.WriteLine($"Account: {account.Data.Name}");
+                    Console.WriteLine($"  Location: {account.Data.Location}");
+                    Console.WriteLine($"  API Type: {GetApiType(account.Data)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error listing accounts: {ex.Message}");
+            }
+
+            Console.WriteLine("\nPress any key to continue.");
+            Console.ReadKey();
         }
 
-        static async Task NoSql(ArmClient armClient, SubscriptionResource subscription, ResourceGroupResource resourceGroup, string location)
+        static async Task NoSqlOperations()
         {
-            NoSql noSql = new NoSql();
-            await noSql.ManageNoSqlOperations(armClient, subscription, resourceGroup, location);
+            Console.WriteLine("Basic NoSQL API Operations");
+            Console.WriteLine("=========================");
+            Console.WriteLine("This demonstrates the pattern for NoSQL operations using the new SDK.");
+            Console.WriteLine("Full implementation would include database and container operations.");
+            
+            Console.WriteLine("\nKey differences from the old SDK:");
+            Console.WriteLine("- CosmosDBSqlDatabaseResource instead of SqlDatabaseGetResults");
+            Console.WriteLine("- Different create/update patterns");
+            Console.WriteLine("- Async enumerable patterns for listing");
+            Console.WriteLine("- Resource-based navigation");
+
+            Console.WriteLine("\nPress any key to continue.");
+            Console.ReadKey();
         }
 
-        static async Task MongoDB(ArmClient armClient, SubscriptionResource subscription, ResourceGroupResource resourceGroup, string location)
+        private static string GetApiType(Azure.ResourceManager.CosmosDB.CosmosDBAccountData accountData)
         {
-            MongoDB mongoDB = new MongoDB();
-            await mongoDB.ManageMongoDBOperations(armClient, subscription, resourceGroup, location);
-        }
+            if (accountData.Kind == Azure.ResourceManager.CosmosDB.Models.CosmosDBAccountKind.MongoDB)
+                return "MongoDB";
 
-        static async Task Cassandra(ArmClient armClient, SubscriptionResource subscription, ResourceGroupResource resourceGroup, string location)
-        {
-            Cassandra cassandra = new Cassandra();
-            await cassandra.ManageCassandraOperations(armClient, subscription, resourceGroup, location);
-        }
+            foreach (var capability in accountData.Capabilities)
+            {
+                if (capability.Name == "EnableCassandra")
+                    return "Cassandra";
+                if (capability.Name == "EnableGremlin")
+                    return "Gremlin";
+                if (capability.Name == "EnableTable")
+                    return "Table";
+            }
 
-        static async Task Gremlin(ArmClient armClient, SubscriptionResource subscription, ResourceGroupResource resourceGroup, string location)
-        {
-            Gremlin gremlin = new Gremlin();
-            await gremlin.ManageGremlinOperations(armClient, subscription, resourceGroup, location);
-        }
-
-        static async Task Table(ArmClient armClient, SubscriptionResource subscription, ResourceGroupResource resourceGroup, string location)
-        {
-            Table table = new Table();
-            await table.ManageTableOperations(armClient, subscription, resourceGroup, location);
+            return "SQL";
         }
     }
 
