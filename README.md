@@ -19,7 +19,8 @@ Outline the file contents of the repository. It helps users navigate the codebas
 
 | File/folder                  | Description                                |
 |------------------------------|--------------------------------------------|
-| `cosmos-management-generated`| Cosmos DB generated management samples.    |
+| `cosmos-management-generated`| Cosmos DB management samples using Microsoft.Azure.Management.CosmosDB SDK.    |
+| `cosmosv2`                   | **NEW**: Cosmos DB management samples using Azure.ResourceManager.CosmosDB SDK (latest preview). |
 
 
 ## Prerequisites
@@ -58,7 +59,21 @@ are out of date. Example above is latest guidance.
 
 ## Key concepts
 
-These samples demonstrate how to manage Cosmos DB resources through it's Control Plane (Resource Provider). You cannot do any database CRUD operations using these samples
+These samples demonstrate how to manage Cosmos DB resources through its Control Plane (Resource Provider). You cannot do any database CRUD operations using these samples.
+
+### cosmos-management-generated
+The original samples using the `Microsoft.Azure.Management.CosmosDB` SDK (auto-generated against the Swagger spec for the Cosmos DB Resource Provider).
+
+### cosmosv2
+**NEW**: Updated samples using the latest preview of `Azure.ResourceManager.CosmosDB` SDK, which follows the modern Azure Resource Manager SDK patterns including:
+
+- Modern authentication with `Azure.Identity`
+- Resource collection navigation patterns
+- Async enumerable for listing operations  
+- Updated model classes and naming conventions
+- Target framework: .NET 8.0
+
+See the [cosmosv2 README](cosmosv2/README.md) for detailed information about the differences and migration approach.
 
 ## Contributing
 
